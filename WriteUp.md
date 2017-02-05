@@ -1,0 +1,66 @@
+# Reflections on Lane Finding
+
+This was my first real attempt at computer vision and using OpenCV, so I
+learned a lot even though I realize this is fairly basic image processing.  
+I expect that I could improve the tuning for Canny and Hough if I had more 
+time to spend on tuning the parameters.
+
+## First Iteration
+
+Under the git branch "homework-rev1" there is a simple pipeline that does 
+reasonably OK on the first two videos but the output from the challenge 
+video is very scruffy.  In rev1, lines are simply split into left/right 
+based on slope, with unreasonable slopes discarded.  The remaining lines 
+are extraplated to the clipping limit and the endpoints are averaged.
+
+This performs well on the static images.  On the white and yellow videos it 
+does OK, but the distant end points are not very stable.  On the challenge
+video the output is scruffy, with lane marker end-points crossing the 
+center line reasonbly often.
+
+## Second Iteration.
+
+For my second iteration (as submitted for review) I made the following
+changes:
+
+- In my line sorting, I discard lines where the extrapolated far end
+  point crosses the center line, and average the remaining lines.  On
+  a few video frames, this results in all lines from either the left
+  or right batch being discarded.
+
+- I attempted to smooth the behavior of the lane marks by averaging the
+  lane lines of the four most recent video frames.  In essense, a four
+  tap FIR filter with coeficients of [0.25, 0.25, 0.25, 0.25]. This does 
+  smooth the lane lines somewhat, but still isn't perfect.  (Note that
+  an artifact of my implementation is that since I am not clearing my
+  filter buffer in the appropriate place, the first 3 frames of a new
+  video are still averaging in data from the previous clip.  This is a
+  simple problem to solve, but since I'm so behind I'm moving on to the
+  second lesson.)
+
+## Possible Improvements
+My method of selecting, extrapolating, and averaging lines is very basic.  
+It is still  not extremely stable on the optional challenge.  Some thoughts 
+that come to mind are:
+
+- Use some simple statistical analysis to throw out more "outlier" lines 
+  before including them in the end-point average.
+
+- Instead of extrapolating every line to the clipping top/bottom limit and 
+  taking the average, fitting the line endpoints to a line might yield a
+  better result although it would be more ocmputationally intensive.
+
+- Dynamically adjust the clipping window by using the current identified 
+  lane lines to compute the corners of the clipping polygon for the next 
+  frame.
+  
+- Account for upcoming curves in the lane lines by processing the image
+  in multiple (say two or three) regions of interest based on distance.
+
+- Explore different options for smoothing data across frames.  My current
+  method of averaging the previous three lane lines is very simplistic.
+
+
+
+
+
