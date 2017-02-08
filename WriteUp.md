@@ -38,17 +38,47 @@ changes:
   simple problem to solve, but since I'm so behind I'm moving on to the
   second lesson.)
 
-## Possible Improvements
+## Reflections on Second Submission
+
+Based on reviewer feedback, I made several adjustments to the Hough
+transform parameters.  This significantly stablized the video
+of the challenge output.
+
+Based on this experience, I would want a better test bench for tuning
+the image pipeline parameters. I want to spend some time thinking about
+how I can add that to my toolkit.
+
+### Possible Failure Modes
+
+Lighting: All of the photos and videos are very brightly and evenly lit.
+Shadows may create false positive recognition of lane lines.  Night 
+lighting is likely to be very challenging.
+
+Noisey data: Extra markings of lane-line-like artifacts would add false
+positive lines to the averages.  Things like turning lane markers,
+tire marks, or even smeared lane line paint might be recognized as parts
+of lane lines.
+
+Tight curves and hills: The software extraplolates straight lines, it
+does not attempt to recognize and fit curves.  Hills will cause perspective
+distortion in otherwise straight lines.
+
+Split lanes: Coming up to a road junction where the road splits from one
+lane to two will sensitize a number of issues.  Lane lines may spread 
+outside the ROI window, and when the lane actually splits there is an
+ambiguity about which subsequent lane to follow.
+
+### Possible Improvements
+
 My method of selecting, extrapolating, and averaging lines is very basic.  
-It is still  not extremely stable on the optional challenge.  Some thoughts 
-that come to mind are:
+Some thoughts that come to mind are:
 
 - Use some simple statistical analysis to throw out more "outlier" lines 
   before including them in the end-point average.
 
 - Instead of extrapolating every line to the clipping top/bottom limit and 
   taking the average, fitting the line endpoints to a line might yield a
-  better result although it would be more ocmputationally intensive.
+  better result although it would be more computationally intensive.
 
 - Dynamically adjust the clipping window by using the current identified 
   lane lines to compute the corners of the clipping polygon for the next 
@@ -60,6 +90,9 @@ that come to mind are:
 - Explore different options for smoothing data across frames.  My current
   method of averaging the previous three lane lines is very simplistic.
 
+- Do more extensive testing with images made under a wide variety of
+  lighting conditions in order to find patter CV parameters, or perhaps
+  create different sets of CV parameters, for instance day/night settings.
 
 
 
